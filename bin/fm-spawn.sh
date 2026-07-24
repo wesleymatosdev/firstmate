@@ -501,12 +501,16 @@ fi
 
 W="fm-$ID"
 T="$SES:$W"
-if tmux list-windows -t "$SES" -F '#{window_name}' | grep -qx "$W"; then
+if tmux list-windows -t "$SES:" -F '#{window_name}' | grep -qx "$W"; then
   echo "error: window $T already exists" >&2
   exit 1
 fi
 
-tmux new-window -d -t "$SES" -n "$W" -c "$PROJ_ABS"
+# Target the SESSION explicitly with a trailing colon: a bare "$SES" resolves to a
+# WINDOW named like the session if one exists (e.g. session "platform" with a window
+# "platform"), so new-window collides on that window's index. "$SES:" forces the
+# session and appends at the next free index.
+tmux new-window -d -t "$SES:" -n "$W" -c "$PROJ_ABS"
 if [ "$KIND" != secondmate ]; then
   tmux send-keys -t "$T" 'treehouse get' Enter
 
