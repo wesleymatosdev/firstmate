@@ -1,0 +1,32 @@
+Branch-prefix configuration end-to-end CLI evidence
+
+$ bin/fm-project-mode.sh --branch-prefix partner-api
+fix/
+
+$ bin/fm-brief.sh prefix-config-e2e partner-api --mode local-only --branch-prefix fix/
+scaffolded: /var/folders/c0/wtr75vlx0ll5pvlhnhflsw2r0000gp/T//fm-prefix-e2e.QrrQ9v/home/data/prefix-config-e2e/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+Generated worker contract:
+1. First action: create your branch: `git checkout -b fix/prefix-config-e2e --`
+1. Never push to any remote and never open a PR. Work only on your `fix/prefix-config-e2e` branch; firstmate handles the merge into local `main`.
+Delivery contract: mode=local-only
+Ship branch: fix/prefix-config-e2e
+
+$ git -C partner-api checkout -b fix/prefix-config-e2e --
+Created and committed the branch named by the delivered worker contract.
+
+Promotion records the selected branch as an immutable task contract:
+promoted promotion-config-e2e to ship mode=local-only yolo=off (teardown protection restored)
+wrote ship instructions for mode=local-only: /var/folders/c0/wtr75vlx0ll5pvlhnhflsw2r0000gp/T//fm-prefix-e2e.QrrQ9v/home/data/promotion-config-e2e/ship-instructions.md
+kind=ship
+mode=local-only
+yolo=off
+branch=fix/promotion-config-e2e
+3. Return to a clean default-branch base, then create your branch: `git checkout -b fix/promotion-config-e2e --`.
+Ship branch: fix/promotion-config-e2e
+
+
+The registry is then changed to wrong/, but the existing task still merges its recorded fix/ branch:
+merged fix/prefix-config-e2e into local main (481e0a7 -> b49be0a) in /var/folders/c0/wtr75vlx0ll5pvlhnhflsw2r0000gp/T//fm-prefix-e2e.QrrQ9v/partner-api
+
+Resulting default-branch HEAD:
+b49be0a (HEAD -> main, fix/prefix-config-e2e) feature
