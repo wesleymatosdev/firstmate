@@ -1,0 +1,1 @@
+Captain, registration needs no further confirmation: your request explicitly authorizes adding `launchpad` with defaults. The next safe action is a read-only SSH-access preflight, then clone/register `git@github.com:acme/launchpad.git` as `launchpad`.
