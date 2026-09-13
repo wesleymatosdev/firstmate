@@ -1,0 +1,9 @@
+=== fm-project-mode.sh --branch-prefix resolves the registered custom prefix ===
+contrib/
+
+=== fm-project-mode.sh default mode/yolo output is unaffected by the branch= annotation ===
+direct-PR off
+
+=== an unregistered project still defaults to the legacy fm/ prefix ===
+warn: project "some-other-project" not in registry; defaulting to branch prefix fm/
+fm/
