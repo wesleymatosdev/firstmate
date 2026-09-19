@@ -1,0 +1,55 @@
+
+--- setup: a third-party project + the captain's project registry ---
+- thirdparty-app [local-only branch=fix/] - external repo, must not read fm/ (added 2026-09-18)
+- vanilla-app [local-only] - registered with no branch override (added 2026-09-18)
+
+--- step 1: intake resolves the prefix from the registry (bin/fm-project-mode.sh) ---
+$ fm-project-mode.sh thirdparty-app
+local-only off
+$ fm-project-mode.sh --branch-prefix thirdparty-app
+fix/
+$ fm-project-mode.sh --branch-prefix vanilla-app
+fm/
+
+--- step 2: the generated ship brief carries the custom branch everywhere (bin/fm-brief.sh) ---
+branch lines inside data/demo-task/brief.md:
+  22:1. First action: create your branch: `git checkout -b fix/demo-task --`
+  25:1. Never push to any remote and never open a PR. Work only on your `fix/demo-task` branch; firstmate handles the merge into local `main`.
+  77:Ship branch: fix/demo-task
+  81:When it is implemented and committed, append `done: ready in branch fix/demo-task` to the status file and stop.
+flag omitted -> the legacy branch is unchanged:
+  22:1. First action: create your branch: `git checkout -b fm/legacy-task --`
+
+--- step 2b: guardrails ---
+$ fm-brief.sh scout-x thirdparty-app --scout --branch-prefix fix/
+error: --branch-prefix applies only to ship briefs; a scout makes no branch and a secondmate charter is not a delivery contract
+exit=1
+$ fm-brief.sh bad-x thirdparty-app --mode local-only --branch-prefix 'bad prefix/'
+error: --branch-prefix must not contain a space (got 'bad prefix/')
+exit=1
+
+--- step 3: promoting a scout with the custom prefix (bin/fm-promote.sh) ---
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+durable task record after promotion (state/demo-scout.meta):
+  4:kind=ship
+  5:mode=local-only
+  6:yolo=off
+  7:branch=fix/demo-scout
+branch lines in the worker's ship-instructions.md:
+  11:3. Return to a clean default-branch base, then create your branch: `git checkout -b fix/demo-scout --`.
+  30:Ship branch: fix/demo-scout
+
+--- step 4: the worker ships on fix/demo-scout and firstmate lands it via the recorded branch (bin/fm-merge-local.sh) ---
+default branch before merge:   0c33df8 initial
+$ fm-merge-local.sh demo-scout
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fix/demo-scout into local main (0c33df8 -> 64858a6) in /tmp/fm-branch-prefix-e2e.9BElfB/thirdparty-app
+default branch after merge:    64858a6 fix the widget
+
+--- done: every leg used the recorded fix/ branch, and the legacy fm/ default is untouched ---
