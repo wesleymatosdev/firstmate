@@ -1,0 +1,11 @@
+$ fm-review-diff.sh L-201 --stat   # review compares the branch recorded in state/L-201.meta (contrib/L-201), not fm/L-201
+diff base: main
+ fix.txt | 1 +
+ 1 file changed, 1 insertion(+)
+exit=0
+
+$ fm-review-diff.sh L-202 --stat   # legacy record (no branch= line, as before this change) falls back to the worktree branch
+diff base: main
+ fix.txt | 1 +
+ 1 file changed, 1 insertion(+)
+exit=0

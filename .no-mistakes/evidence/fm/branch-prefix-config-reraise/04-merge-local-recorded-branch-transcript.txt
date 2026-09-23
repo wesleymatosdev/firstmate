@@ -1,0 +1,13 @@
+$ fm-merge-local.sh L-201   # approved local-only landing fast-forwards main to the RECORDED ship branch
+-- before: main is at
+15692da base
+
+merged contrib/L-201 into local main (15692da -> a605f9e) in /Users/wesleymatos/.no-mistakes/worktrees/d55b50122afc/01M37YDSAGECBZST0BDQ5YQPRB/.tmp-e2e-demo/contrib-proj
+exit=0
+
+-- after: main fast-forwarded to the recorded contrib/L-201 tip:
+a605f9e fix: the actual work
+15692da base
+a605f9e fix: the actual work
+ fix.txt | 1 +
+ 1 file changed, 1 insertion(+)

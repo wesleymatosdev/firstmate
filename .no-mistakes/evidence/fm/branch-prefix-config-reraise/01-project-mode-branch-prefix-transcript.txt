@@ -1,0 +1,20 @@
+$ fm-project-mode.sh --branch-prefix vendor-sdk   # third-party project registers branch=fix/
+fix/
+
+$ fm-project-mode.sh --branch-prefix bare-branch-proj   # branch= resolves empty
+
+(empty line above = bare <task-id> ship branch)
+
+$ fm-project-mode.sh --branch-prefix classic-proj   # no token -> legacy default
+fm/
+
+$ fm-project-mode.sh --branch-prefix not-registered   # unknown project -> legacy default + warn
+warn: project "not-registered" not in registry; defaulting to no-mistakes off
+fm/
+
+$ fm-project-mode.sh vendor-sdk   # default two-word output unchanged; prefix never leaks
+direct-PR on
+
+$ fm-project-mode.sh --branch-prefix vendor-sdk   # tokens are order-independent: forge row
+feature/
+gerrit

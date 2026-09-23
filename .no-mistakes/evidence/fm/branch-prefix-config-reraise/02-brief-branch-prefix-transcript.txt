@@ -1,0 +1,19 @@
+$ fm-brief.sh T-101 vendor-sdk --mode direct-PR --yolo-flag-not-taken-here --branch-prefix fix/  (intake renders the brief)
+scaffolded: /Users/wesleymatos/.no-mistakes/worktrees/d55b50122afc/01M37YDSAGECBZST0BDQ5YQPRB/.tmp-e2e-demo/home/data/T-101/brief.md (ship, mode=direct-PR; replace {TASK} and {FIRSTMATE_SPEC})
+
+--- brief lines proving the configured branch reached the worker contract:
+78:Ship branch: fix/T-101
+22:1. First action: create your branch: `git checkout -b fix/T-101 --`
+
+$ fm-brief.sh T-102 bare-branch-proj --mode local-only --branch-prefix ""   (empty prefix -> bare task-id branch)
+scaffolded: /Users/wesleymatos/.no-mistakes/worktrees/d55b50122afc/01M37YDSAGECBZST0BDQ5YQPRB/.tmp-e2e-demo/home/data/T-102/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+78:Ship branch: T-102
+22:1. First action: create your branch: `git checkout -b T-102 --`
+
+$ fm-brief.sh T-103 vendor-sdk --scout --branch-prefix fix/   (refused: scouts make no branch)
+error: --branch-prefix applies only to ship briefs; a scout makes no branch and a secondmate charter is not a delivery contract
+exit=1
+
+$ fm-brief.sh T-104 vendor-sdk --mode direct-PR --branch-prefix "has space"   (refused: space in prefix)
+error: --branch-prefix must not contain a space (got 'has space')
+exit=1
