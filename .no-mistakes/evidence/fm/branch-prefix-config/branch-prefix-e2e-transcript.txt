@@ -1,74 +1,65 @@
+=== End-to-end demo of the configurable ship-branch prefix (branch fm/branch-prefix-config) ===
+Run against the worktree checkout at HEAD (2df387e), with a scratch firstmate home.
+Every command shown was executed for real; output is verbatim.
 
-=== Act 1: the captain registers the third-party project with a custom ship-branch prefix ===
-- vendorlib [local-only branch=contrib/] - third-party library; must not read as firstmate-authored (added 2026-09-13)
-- mylib [local-only] - own library; no prefix preference (added 2026-09-13)
-- barepref [local-only branch=] - wants bare <task-id> branches (added 2026-09-13)
+=== 1. The captain's registry (data/projects.md in the demo home) ===
 
-$ bin/fm-project-mode.sh --branch-prefix vendorlib   # firstmate resolves the prefix at intake
-contrib/
-$ bin/fm-project-mode.sh --branch-prefix mylib       # no annotation -> legacy default
-fm/
-$ bin/fm-project-mode.sh --branch-prefix barepref    # empty override -> bare <task-id> branch
+- upstream-lib [local-only branch=contrib/] - a third-party repo that must not read as firstmate-authored (added 2026-09-23)
+- bare-branch-lib [direct-PR branch=] - ships on a bare task-id branch (added 2026-09-23)
+- legacy-lib - default posture, no prefix recorded (added 2026-09-23)
 
-(resolved to: '')
-$ bin/fm-project-mode.sh vendorlib                   # mode/yolo output is unchanged by the new annotation
-local-only off
+=== 2. Firstmate resolves the registered prefix at task intake (fm-project-mode.sh --branch-prefix) ===
 
-=== Act 2: firstmate generates the ship brief with the resolved prefix ===
-scaffolded: /tmp/fm-branch-prefix-demo-run.3sUAZ4/home/data/demo-task-42/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
--- excerpt of the generated brief the worker receives --
-22:1. First action: create your branch: `git checkout -b contrib/demo-task-42 --`
-25:1. Never push to any remote and never open a PR. Work only on your `contrib/demo-task-42` branch; firstmate handles the merge into local `main`.
-77:Ship branch: contrib/demo-task-42
-79:The task is complete only when committed on your branch `contrib/demo-task-42`. Do NOT push, do NOT open a PR, do NOT merge.
-81:When it is implemented and committed, append `done: ready in branch contrib/demo-task-42` to the status file and stop.
+$ for p in upstream-lib bare-branch-lib legacy-lib; do ...; done
+upstream-lib: mode+yolo=[local-only off] branch-prefix=[contrib/]
+bare-branch-lib: mode+yolo=[direct-PR off] branch-prefix=[]
+legacy-lib: mode+yolo=[no-mistakes off] branch-prefix=[fm/]
 
--- legacy default: same brief without --branch-prefix keeps fm/<task-id> --
-22:1. First action: create your branch: `git checkout -b fm/demo-task-43 --`
-77:Ship branch: fm/demo-task-43
+The token is order-independent, an empty branch= resolves to "" (bare <task-id> branch),
+an unannotated project keeps the legacy fm/, and the default "<mode> <yolo>" output that
+existing mechanical callers consume is unchanged for every project.
 
--- bare <task-id> branch: --branch-prefix '' --
-22:1. First action: create your branch: `git checkout -b demo-task-44 --`
-77:Ship branch: demo-task-44
+=== 3. Scaffold a ship task with the resolved override (local-only mode shown) ===
 
-=== Act 3: fm-spawn enforces the brief's ship branch at launch ===
-(demonstrated separately with FM_GATE_REFUSE_BYPASS=1 -- this session is itself a no-mistakes gate agent;
- see the Act 3 transcript that follows this one in the combined evidence file)
+$ FM_HOME=<home> bin/fm-brief.sh task-e2e some-proj --mode local-only --branch-prefix 'contrib/'
+scaffolded: <home>/data/task-e2e/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
 
-=== Act 4: fm-merge-local lands the recorded contrib/<id> branch (not fm/<id>) ===
--- project state before merge: default branch 'main' is at 87b5172
-$ bin/fm-merge-local.sh demo-task-99   # captain-approved local landing
-●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-●  WATCHER DOWN - SUPERVISION IS OFF
-●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
-●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
-●  This is a supervision warning only; the guarded operation WILL still run.
-●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
-●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-merged contrib/demo-task-99 into local main (87b5172 -> 2686daf) in /tmp/fm-branch-prefix-demo-run.3sUAZ4/vendorlib
-exit=0
--- project state after merge --
-default branch HEAD: 2686daf (contrib tip was 2686daf1d2327c406f10bc73dc63b83959b2eab2 short=2686daf)
-VERIFIED: default branch fast-forwarded onto the recorded contrib/ branch
-2686daf the crewmate's fix, landed on contrib/demo-task-99
-87b5172 initial
+Branch references in the generated brief (verbatim grep):
+22:1. First action: create your branch: `git checkout -b contrib/task-e2e --`
+25:1. Never push to any remote and never open a PR. Work only on your `contrib/task-e2e` branch; firstmate handles the merge into local `main`.
+78:Ship branch: contrib/task-e2e
+80:The task is complete only when committed on your branch `contrib/task-e2e`. Do NOT push, do NOT open a PR, do NOT merge.
+83:When it is implemented and committed, append `done [at=<epoch>]: ready in branch contrib/task-e2e` to the status file and stop.
 
-=== Cleanup ===
-demo fixture removed: /tmp/fm-branch-prefix-demo-run.3sUAZ4
+The override renders in every generated section: branch-creation command, never-push rule,
+status line, definition-of-done text, and status-message text. No fm/task-e2e remains.
 
-=== Act 3: fm-spawn enforces the brief's ship branch at launch ===
-Brief context: Ship branch: contrib/demo-task-42
+=== 4. Stock install: no flag, no annotation -> legacy fm/<task-id> unchanged ===
 
-$ spawn with the DEFAULT prefix while the brief records contrib/<id>  (expected: branch-mismatch refusal, no task record)
-error: branch mismatch for demo-task-42: the brief says branch=contrib/demo-task-42 but this spawn selected branch=fm/demo-task-42
-exit=1
-task record written: no
+$ FM_HOME=<home> bin/fm-brief.sh task-e2e-legacy some-proj --mode local-only
+22:1. First action: create your branch: `git checkout -b fm/task-e2e-legacy --`
+25:1. Never push to any remote and never open a PR. Work only on your `fm/task-e2e-legacy` branch; ...
 
-$ spawn with the MATCHING --branch-prefix contrib/  (expected: past the branch contract; stopped only by the fake tmux backend, which refuses by design)
-exit=1
--- fake tmux backend invocation log (proves the launch path was reached) --
-fake-tmux invoked with: has-session -t firstmate
-fake-tmux invoked with: new-session -d -s firstmate
-fake-tmux invoked with: list-windows -t firstmate -F #{window_name}
-fake-tmux invoked with: new-window -dP -F #{window_id} -t firstmate: -n fm-demo-task-42 -c /tmp/fm-branch-prefix-act3.usYm2o/vendorlib
-demo fixture removed: /tmp/fm-branch-prefix-act3.usYm2o
+=== 5. Empty override resolves to a bare <task-id> branch, no leading slash ===
+
+$ FM_HOME=<home> bin/fm-brief.sh task-e2e-bare some-proj --mode local-only --branch-prefix ''
+22:1. First action: create your branch: `git checkout -b task-e2e-bare --`
+25:1. Never push to any remote and never open a PR. Work only on your `task-e2e-bare` branch; ...
+
+=== 6. Misuse is refused loudly ===
+
+$ bin/fm-brief.sh scout-task some-proj --scout --branch-prefix contrib/
+error: --branch-prefix applies only to ship briefs; a scout makes no branch and a secondmate charter is not a delivery contract  (exit 1)
+
+$ bin/fm-brief.sh bad-task some-proj --mode no-mistakes --branch-prefix 'bad prefix/'
+error: --branch-prefix must not contain a space (got 'bad prefix/')  (exit 1)
+
+=== 7. Review side: bearings maps a custom-prefix PR row back to its recorded task ===
+
+Suite run (tests/fm-bearings-snapshot.test.sh), verbatim line from the captured log:
+ok - --include-prs maps a custom branch-prefix PR back to its recorded task
+
+=== 8. Relaunch side: a promoted scout with a recorded custom branch relaunches on it ===
+
+Suite run (tests/fm-control-relaunch.test.sh), verbatim line from the captured log:
+ok - fm-spawn --relaunch: a promoted scout with a recorded custom branch relaunches on it instead of being refused
