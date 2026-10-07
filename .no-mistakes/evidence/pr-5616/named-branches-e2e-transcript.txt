@@ -1,0 +1,72 @@
+
+==== fixture: project repo with default branch 'main' and integration branch 'office' ====
+project: /tmp/fm-named-demo/run.dI5NVU/project
+  main
+* office
+  remotes/origin/main
+  remotes/origin/office
+
+==== 1. launch brief: scout on named base 'office' ====
+--- rendered /tmp/fm-named-demo/run.dI5NVU/home/data/demo-pr/brief.md (branch-relevant lines) ---
+You are in a disposable git worktree of proj, at a detached HEAD on a clean copy of its base branch.
+Base branch: office
+
+==== 2. promote: scout -> direct-PR ship on crew branch feature/widget, base office ====
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warn: no registry at /tmp/fm-named-demo/run.dI5NVU/home/data/projects.md; defaulting project to no-mistakes off
+promoted demo-pr to ship mode=direct-PR yolo=off (teardown protection restored)
+wrote ship instructions for mode=direct-PR: /tmp/fm-named-demo/run.dI5NVU/home/data/demo-pr/ship-instructions.md
+next: FM_HOME=/tmp/fm-named-demo/run.dI5NVU/home bin/fm-send.sh fm-demo-pr "$(cat /tmp/fm-named-demo/run.dI5NVU/home/data/demo-pr/ship-instructions.md)"
+--- recorded meta ---
+window=fm-demo-pr
+worktree=/tmp/fm-named-demo/run.dI5NVU/project
+project=/tmp/fm-named-demo/run.dI5NVU/project
+kind=ship
+mode=direct-PR
+yolo=off
+branch=feature/widget
+base_branch=office
+--- rendered /tmp/fm-named-demo/run.dI5NVU/home/data/demo-pr/ship-instructions.md (branch-relevant lines) ---
+1. Never push to the base branch `office` or the default branch (push only your `feature/widget` branch). Never merge a PR.
+Ship branch: feature/widget
+When it is implemented and committed, push your branch and open a PR with `gh-axi` that is ready for review, not a draft, against the base branch `office` (`--base office`), not the repository default.
+
+==== 3. crew work lands on feature/widget; review diffs against the recorded base ====
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: origin/office
+ widget | 1 +
+ 1 file changed, 1 insertion(+)
+
+==== 4. validation: base/crew selections that cannot work are refused ====
+brief local-only + --base-branch -> exit 1: error: fm-brief.sh --base-branch: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base
+brief crew branch == base branch  -> exit 1: error: --base-branch cannot be the crew branch (office); choose a different base branch
+brief base branch with a space    -> exit 1: error: fm-brief.sh --base-branch: base branch 'has space' is not a valid git branch name
+promote changing scout base       -> exit 1: WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warn: no registry at /tmp/fm-named-demo/run.dI5NVU/home/data/projects.md; defaulting project to no-mistakes off
+error: --base-branch cannot change the scout's recorded base during promotion; promote with base_branch=office to preserve the existing worktree, or omit --base-branch to keep it
+promote onto occupied branch      -> exit 1: WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warn: no registry at /tmp/fm-named-demo/run.dI5NVU/home/data/projects.md; defaulting project to no-mistakes off
+error: crew branch feature/widget is already assigned to task demo-pr; refusing promotion with a shared branch
+
+==== 5. restating an unrecorded base at promotion is allowed ====
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warn: no registry at /tmp/fm-named-demo/run.dI5NVU/home/data/projects.md; defaulting project to no-mistakes off
+meta now records:
+branch=feature/restate
+base_branch=office
+
+==== 6. local-only keeps the no-base contract and lands on the default branch ====
+--- rendered brief (landing lines) ---
+1. Never push to any remote and never open a PR. Work only on your `feature/offline` branch; firstmate handles the merge into local `main`.
+When it is implemented and committed, append `done [at=<epoch>]: ready in branch feature/offline` to the status file and stop.
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged feature/offline into local main (2e7ced1 -> 50c2472) in /tmp/fm-named-demo/run.dI5NVU/project
+main now at: 50c2472 (active checkout: main)
+
+==== demo complete: /tmp/fm-named-demo/run.dI5NVU ====
